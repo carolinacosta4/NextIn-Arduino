@@ -1,9 +1,9 @@
 #include <LiquidCrystal.h>
+
 LiquidCrystal lcd(12, 11, 10, 5, 4, 3, 2);
 
 int backLight = 8;
 int buzzer = 7;
-int currentNumber = 0;
 
 void setup() {
   pinMode(backLight, OUTPUT);
@@ -13,7 +13,7 @@ void setup() {
   lcd.setCursor(0, 0);
   lcd.print("Proxima senha:");
   lcd.setCursor(0, 1);
-  lcd.print(currentNumber);
+  lcd.print(" ");  // Limpa o campo da senha
 
   Serial.begin(9600);
   pinMode(buzzer, OUTPUT);
@@ -21,35 +21,20 @@ void setup() {
 }
 
 void loop() {
-
-
   // Verifica se há dados disponíveis na porta serial
   if (Serial.available() > 0) {
-    String data = Serial.readStringUntil('\n'); // Lê até o final da linha
-    int newNumber = data.toInt(); // Converte o dado para número
+    String data = Serial.readStringUntil('\n'); // Lê a linha inteira com a senha formatada, como B01 ou C10
 
-    if (newNumber != currentNumber && newNumber > 0) {  // Checa se é um novo número válido
-      currentNumber = newNumber;
+    // Toca o buzzer ao mudar o número
+    tone(buzzer, 1500, 1000);
+    delay(1000);
+    noTone(buzzer);
 
-
-
-
-     // Atualiza o display com o novo número
-      lcd.setCursor(0, 1);
-      lcd.setCursor(2, 1);
-      lcd.print(newNumber);
-
-
-      // Toca o buzzer ao mudar o número
-      tone(buzzer, 1500, 1000);
-      delay(1000);
-      noTone(buzzer);
-
-      // Atualiza o display com o novo número
-      lcd.setCursor(0, 1);
-      lcd.setCursor(2, 1);
-      lcd.print(newNumber);
-    }
+    // Atualiza o display com o número da senha diretamente
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Proxima senha:");
+    lcd.setCursor(0, 1);
+    lcd.print(data); 
   }
-
 }
